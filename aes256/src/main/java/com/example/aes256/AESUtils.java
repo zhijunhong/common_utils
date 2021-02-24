@@ -39,8 +39,6 @@ public class AESUtils {
     }
 
     /**
-     * 加密 128位
-     *
      * @param content 需要加密的原内容
      * @param pkey    密匙
      * @param
@@ -82,7 +80,6 @@ public class AESUtils {
 
     /**
      * @param content 加密前原内容
-     * @param pkey    长度为16个字符,128位
      * @param iv
      * @return base64EncodeStr   aes加密完成后内容
      * @throws
@@ -129,7 +126,7 @@ public class AESUtils {
 
 
     /**
-     * @param content base64处理过的字符串
+     * @param base64EncryptStr base64处理过的字符串
      * @param pkey    密匙
      * @param
      * @return String    返回类型
@@ -138,8 +135,8 @@ public class AESUtils {
      * @Title: aesDecodeStr
      * @Description: 解密 失败将返回NULL
      */
-    public static String aesDecodeStr3(String content, byte[] pkey, String IV) throws Exception {
-        byte[] base64DecodeStr = Base64Utils.decode(content);
+    public static String aesDecodeStr3(String base64EncryptStr, byte[] pkey, String IV) throws Exception {
+        byte[] base64DecodeStr = Base64Utils.decode(base64EncryptStr);
         byte[] aesDecode = aesDecode(base64DecodeStr, pkey, IV);
         if (aesDecode == null) {
             return null;
@@ -152,20 +149,20 @@ public class AESUtils {
     /**
      * 解密
      *
-     * @param content 解密前的byte数组
+     * @param encryptStr 解密前的byte数组
      * @param pkey    密匙
      * @param IV
      * @return result  解密后的byte数组
      * @throws Exception
      */
-    public static byte[] aesDecode(byte[] content, byte[] pkey, String IV) throws Exception {
+    public static byte[] aesDecode(byte[] encryptStr, byte[] pkey, String IV) throws Exception {
         //SecretKey secretKey = generateKey(pkey);
         //byte[] enCodeFormat = secretKey.getEncoded();
         SecretKeySpec skey = new SecretKeySpec(pkey, "AES");
         IvParameterSpec iv = new IvParameterSpec(IV.getBytes("UTF-8"));
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");// 创建密码器
         cipher.init(Cipher.DECRYPT_MODE, skey, iv);// 初始化解密器
-        byte[] result = cipher.doFinal(content);
+        byte[] result = cipher.doFinal(encryptStr);
         return result; // 解密
 
     }

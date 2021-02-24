@@ -16,10 +16,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         try {
             byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
-            String encryptStr = AESUtils.aesEncryptStr("zhijunhong", pkey, AESUtils.IV);    //密文
-            Log.i(TAG, "encryptStr: " + encryptStr + "\n");
+            String base64EncryptStr = AESUtils.aesEncryptStr("我是明文 ", pkey, AESUtils.IV);    //密文
+            Log.i(TAG, "encryptStr: " + base64EncryptStr + "\n");
 
-            String decodeStr = AESUtils.aesDecodeStr3(encryptStr, pkey, AESUtils.IV);
+            String decodeStr = AESUtils.aesDecodeStr3(base64EncryptStr, pkey, AESUtils.IV);
             Log.i(TAG, "decodeStr: " + decodeStr + "\n");
 
         } catch (NoSuchAlgorithmException e) {
