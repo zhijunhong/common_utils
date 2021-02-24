@@ -89,9 +89,9 @@ public class AESUtils {
     public static String aesEncryptStr(String content, byte[] pkey, String iv) {
         byte[] aesEncrypt = aesEncrypt(content, pkey, iv);
         System.out.println("加密后的byte数组:" + Arrays.toString(aesEncrypt));
-        String base64EncodeStr = Base64Utils.encode(aesEncrypt);
-        System.out.println("加密后 base64EncodeStr:" + base64EncodeStr);
-        return base64EncodeStr;
+        String base64EncryptStr = Base64Utils.encode(aesEncrypt);
+        System.out.println("加密后 base64EncodeStr:" + base64EncryptStr);
+        return base64EncryptStr;
     }
 
     /**

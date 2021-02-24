@@ -57,18 +57,18 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
 ......
   
 /**
- * 生成秘钥
- *
- * @param username
- * @param password
- * @param random
- * @return
- * @throws NoSuchAlgorithmException
- */
-private byte[] generatePkey(String username, String password, String random) throws NoSuchAlgorithmException {
-    String mD5Str = MD5Utility.getMD5DefaultEncode(username + random + password);
-    return Sha256Utils.getSHA256ByteArray(random + mD5Str);
-}
+     * 生成秘钥
+     *
+     * @param username
+     * @param password
+     * @param random
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    private byte[] generatePkey(String username, String password, String random) throws NoSuchAlgorithmException {
+        String mD5Str = MD5Utility.getMD5DefaultEncode(username + random + password);
+        return Sha256Utils.getSHA256ByteArray(random + mD5Str);
+    }
 ```
 
 ### 使用密钥加密明文
@@ -76,13 +76,12 @@ private byte[] generatePkey(String username, String password, String random) thr
 从步骤1获取的密钥pkey，还需要指定向量IV，这里随机指定IV为一组数据串，实际项目中，需要协定统一的IV向量来加密明文。
 
 ```java
-  String base64EncryptStr = AESUtils.aesEncryptStr("我是明文", pkey, AESUtils.IV);    //密文
+  String base64EncryptStr = AESUtils.aesEncryptStr("我是明文 ", pkey, AESUtils.IV);    //密文
 
 ......
 
- /**
+  /**
      * @param content 加密前原内容
-     * @param pkey    长度为16个字符,128位
      * @param iv
      * @return base64EncodeStr   aes加密完成后内容
      * @throws
@@ -92,110 +91,108 @@ private byte[] generatePkey(String username, String password, String random) thr
     public static String aesEncryptStr(String content, byte[] pkey, String iv) {
         byte[] aesEncrypt = aesEncrypt(content, pkey, iv);
         System.out.println("加密后的byte数组:" + Arrays.toString(aesEncrypt));
-        String base64EncodeStr = Base64Utils.encode(aesEncrypt);
-        System.out.println("加密后 base64EncodeStr:" + base64EncodeStr);
-        return base64EncodeStr;
+        String base64EncryptStr = Base64Utils.encode(aesEncrypt);
+        System.out.println("加密后 base64EncodeStr:" + base64EncryptStr);
+        return base64EncryptStr;
     }
 ```
 
-这里加密方法`aesEncrypt(String content, byte[] pkey, String iv)`的参数说明：
+加密方法，参数说明：
 
-content：待加密的明文
-
-pkey：加密秘钥
-
-iv:加密向量IV
+- content：待加密的明文
+- pkey：上一步骤生成的加密秘钥
+- iv:加密向量IV
 
 其中，具体加密方法`aesEncrypt(String content, byte[] pkey, String IV)`如下：
 
 ```java
 /**
- * @param content 需要加密的原内容
- * @param pkey    密匙
- * @param
- * @return
- */
-public static byte[] aesEncrypt(String content, byte[] pkey, String IV) {
-    try {
-        //SecretKey secretKey = generateKey(pkey);
-        //byte[] enCodeFormat = secretKey.getEncoded();
-        SecretKeySpec skey = new SecretKeySpec(pkey, "AES");
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");// "算法/加密/填充"
-        IvParameterSpec iv = new IvParameterSpec(IV.getBytes());
-        cipher.init(Cipher.ENCRYPT_MODE, skey, iv);//初始化加密器
-        byte[] encrypted = cipher.doFinal(content.getBytes("UTF-8"));
-        return encrypted; // 加密
-    } catch (Exception e) {
-        Log.i(TAG,"aesEncrypt() method error:", e);
+     * @param content 需要加密的原内容
+     * @param pkey    密匙
+     * @param
+     * @return
+     */
+    public static byte[] aesEncrypt(String content, byte[] pkey, String IV) {
+        try {
+            //SecretKey secretKey = generateKey(pkey);
+            //byte[] enCodeFormat = secretKey.getEncoded();
+            SecretKeySpec skey = new SecretKeySpec(pkey, "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");// "算法/加密/填充"
+            IvParameterSpec iv = new IvParameterSpec(IV.getBytes());
+            cipher.init(Cipher.ENCRYPT_MODE, skey, iv);//初始化加密器
+            byte[] encrypted = cipher.doFinal(content.getBytes("UTF-8"));
+            return encrypted; // 加密
+        } catch (Exception e) {
+            Log.i(TAG,"aesEncrypt() method error:", e);
+        }
+        return null;
     }
-    return null;
-}
 ```
 
-最后，进行一轮base64转码`String base64EncodeStr = Base64Utils.encode(aesEncrypt);`操作后，输出密文字符串`base64EncodeStr`。
+最后，进行一轮base64转码`String base64EncryptStr = Base64Utils.encode(aesEncrypt);`操作后，输出密文字符串base64EncryptStr。
 
 ### 使用密钥解密密文
 
 秘钥解密的过程就是加密的逆过程，如下：解密方法
 
 ```java
- String decodeStr = AESUtils.aesDecodeStr3(base64EncryptStr, pkey, AESUtils.IV);
+  String decodeStr = AESUtils.aesDecodeStr3(base64EncryptStr, pkey, AESUtils.IV);
 ```
 
 解密方法，传递三个参数：
 
-- base64EncodeStr：base64编码过的加密密文
+- base64EncryptStr：base64编码过的加密密文
 - pkey：秘钥（同加密秘钥）
 - IV：向量
 
-具体解密过程：先通过base64还原编码再通过`aesDecode(byte[] base64EncryptStr, byte[] pkey, String IV)`解密
+具体解密过程：先通过base64还原密文编码，再通过`aesDecode(byte[] encryptStr, byte[] pkey, String IV)`方法进行解密
 
 ```java
-/**
- * @param encryptStr base64处理过的字符串
- * @param pkey    密匙
- * @param
- * @return String    返回类型
- * @throws Exception
- * @throws
- * @Title: aesDecodeStr
- * @Description: 解密 失败将返回NULL
- */
-public static String aesDecodeStr3(String base64EncryptStr, byte[] pkey, String IV) throws Exception {
-    byte[] base64DecodeStr = Base64Utils.decode(base64EncryptStr);
-    byte[] aesDecode = aesDecode(base64DecodeStr, pkey, IV);
-    if (aesDecode == null) {
-        return null;
+  /**
+     * @param base64EncryptStr base64处理过的字符串
+     * @param pkey    密匙
+     * @param
+     * @return String    返回类型
+     * @throws Exception
+     * @throws
+     * @Title: aesDecodeStr
+     * @Description: 解密 失败将返回NULL
+     */
+    public static String aesDecodeStr3(String base64EncryptStr, byte[] pkey, String IV) throws Exception {
+        byte[] base64DecodeStr = Base64Utils.decode(base64EncryptStr);
+        byte[] aesDecode = aesDecode(base64DecodeStr, pkey, IV);
+        if (aesDecode == null) {
+            return null;
+        }
+        String result;
+        result = new String(aesDecode, "UTF-8");
+        return result;
     }
-    String result;
-    result = new String(aesDecode, "UTF-8");
-    return result;
-}
 ```
 
-其中，aesDecode(byte[] encryptStr, byte[] pkey, String IV)方法的具体实现，基本和加密过程相差不大。
+其中，aesDecode(byte[] encryptStr, byte[] pkey, String IV)方法的具体实现，基本和加密过程相差不大，如下：
 
 ```java
 /**
- * 解密
- *
- * @param content 解密前的byte数组
- * @param pkey    密匙
- * @param IV
- * @return result  解密后的byte数组
- * @throws Exception
- */
-public static byte[] aesDecode(byte[] encryptStr, byte[] pkey, String IV) throws Exception {
-    //SecretKey secretKey = generateKey(pkey);
-    //byte[] enCodeFormat = secretKey.getEncoded();
-    SecretKeySpec skey = new SecretKeySpec(pkey, "AES");
-    IvParameterSpec iv = new IvParameterSpec(IV.getBytes("UTF-8"));
-    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");// 创建密码器
-    cipher.init(Cipher.DECRYPT_MODE, skey, iv);// 初始化解密器
-    byte[] result = cipher.doFinal(content);
-    return result; // 解密
+     * 解密
+     *
+     * @param encryptStr 解密前的byte数组
+     * @param pkey    密匙
+     * @param IV
+     * @return result  解密后的byte数组
+     * @throws Exception
+     */
+    public static byte[] aesDecode(byte[] encryptStr, byte[] pkey, String IV) throws Exception {
+        //SecretKey secretKey = generateKey(pkey);
+        //byte[] enCodeFormat = secretKey.getEncoded();
+        SecretKeySpec skey = new SecretKeySpec(pkey, "AES");
+        IvParameterSpec iv = new IvParameterSpec(IV.getBytes("UTF-8"));
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");// 创建密码器
+        cipher.init(Cipher.DECRYPT_MODE, skey, iv);// 初始化解密器
+        byte[] result = cipher.doFinal(encryptStr);
+        return result; // 解密
 
-}
+    }
 ```
 
 通过上述一系列操作后，最后将获取的字符数组，通过`new String(aesDecode, "UTF-8")`操作，就可以将密文重新解密成明文*"我是明文"*。
