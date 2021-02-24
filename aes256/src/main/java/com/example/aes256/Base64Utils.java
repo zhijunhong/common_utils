@@ -6,7 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by 29217 on 2016/8/23.
  * Base64加密、解密
  */
 public class Base64Utils {

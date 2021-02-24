@@ -20,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * @author zhijunhong
  * @ClassName: AESUtils
- * @Description: aes对称加密解密工具类, 注意密钥不能随机生机, 不同客户端调用可能需要考虑不同Provider
+ * @Description: aes对称加密解密工具类, 注意密钥不能随机生机
  */
 public class AESUtils {
     public static final String TAG = AESUtils.class.getSimpleName();

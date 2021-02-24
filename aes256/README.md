@@ -214,6 +214,8 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
 
 [AES加密算法的详细介绍与实现](https://blog.csdn.net/qq_28205153/article/details/55798628)
 
+[SSL在线工具-AES在线加解密|AES在线加密](https://www.ssleye.com/aes_cipher.html) 非常好用的在线验证AES加解密结果网站
+
 
 
 
