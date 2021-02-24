@@ -197,7 +197,10 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
 
 通过上述一系列操作后，最后将获取的字符数组，通过`new String(aesDecode, "UTF-8")`操作，就可以将密文重新解密成明文*"我是明文"*。
 
-
+```
+2021-02-24 18:05:33.651 21560-21560/com.example.aes256 I/MainActivity: encryptStr: y9COgiC06V2E1CIuhJbPfg==
+2021-02-24 18:05:33.652 21560-21560/com.example.aes256 I/MainActivity: decodeStr: 我是明文 
+```
 
 完整代码：https://github.com/zhijunhong/common_utils/tree/master/aes256
 
