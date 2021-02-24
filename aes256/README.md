@@ -22,7 +22,7 @@ GitHub链接地址：https://github.com/zhijunhong/common_utils/tree/master/aes2
 
 高级加密标准(AES,Advanced Encryption Standard)为最常见的对称加密算法。对称加密算法：简单来说就是加密和解密过程中使用的秘钥（根据一定的规则生成）是相同的。
 
-![img]https://github.com/zhijunhong/common_utils/blob/master/art/20210224001.png
+![img](https://github.com/zhijunhong/common_utils/blob/master/art/20210224001.png)
 
 下面简单介绍下各个部分的作用与意义：
 
@@ -204,7 +204,7 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
 
 完整代码：https://github.com/zhijunhong/common_utils/tree/master/aes256
 
-**最后，别忘了点一下start哟~**
+**最后，别忘了点一下star哟~**
 
 
 
