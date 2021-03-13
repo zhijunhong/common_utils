@@ -1,3 +1,4 @@
+include ':utils'
 include ':aes256'
 include ':app'
 rootProject.name = "common_utils"
