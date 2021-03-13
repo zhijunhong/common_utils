@@ -10,7 +10,6 @@ public class FileUtils {
      * @return size
      */
     public static String getFormatSize(long size) {
-
         long kiloByte = size / 1024;
         if (kiloByte < 1) {
             return size + "B";
