@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
             String base64EncryptStr = AESUtils.aesEncryptStr("我是明文 ", pkey, AESUtils.IV);    //密文
             Log.i(TAG, "encryptStr: " + base64EncryptStr + "\n");
 
-            String decodeStr = AESUtils.aesDecodeStr2(base64EncryptStr, pkey, AESUtils.IV);
+            String decodeStr = AESUtils.aesDecodeStr2(base64EncryptStr, pkey, AESUtils.IV);             //明文
             Log.i(TAG, "decodeStr: " + decodeStr + "\n");
 
         } catch (NoSuchAlgorithmException e) {
