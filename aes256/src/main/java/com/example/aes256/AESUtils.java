@@ -30,7 +30,7 @@ public class AESUtils {
 
     /**
      * 使用PKCS7Padding填充必须添加一个支持PKCS7Padding的Provider
-     * 类加载的时候就判断是否已经有支持256位的Provider,如果没有则添加进去
+     * 类加载的时候就判断是否已经有支持256位的Provider,如果没有则添加进去bcprov-jdk15-133.jar这个jar包
      */
     static {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
@@ -52,7 +52,7 @@ public class AESUtils {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");// "算法/加密/填充"
             IvParameterSpec iv = new IvParameterSpec(IV.getBytes());
             cipher.init(Cipher.ENCRYPT_MODE, skey, iv);//初始化加密器
-            byte[] encrypted = cipher.doFinal(content.getBytes("UTF-8"));
+            byte[] encrypted = cipher.doFinal(content.getBytes("UTF-8"));              //字符编码很重要，不同的字符编码对应的byte位是不一样的，将直接影响解密的结果
             return encrypted; // 加密
         } catch (Exception e) {
             Log.i(TAG,"aesEncrypt() method error:", e);
@@ -89,7 +89,7 @@ public class AESUtils {
     public static String aesEncryptStr(String content, byte[] pkey, String iv) {
         byte[] aesEncrypt = aesEncrypt(content, pkey, iv);
         System.out.println("加密后的byte数组:" + Arrays.toString(aesEncrypt));
-        String base64EncryptStr = Base64Utils.encode(aesEncrypt);
+        String base64EncryptStr = Base64Utils.encode(aesEncrypt);                                   //加密后的密文一般编辑器会显示乱码，需要使用base64重新编码后显示
         System.out.println("加密后 base64EncodeStr:" + base64EncryptStr);
         return base64EncryptStr;
     }
@@ -135,14 +135,14 @@ public class AESUtils {
      * @Title: aesDecodeStr
      * @Description: 解密 失败将返回NULL
      */
-    public static String aesDecodeStr3(String base64EncryptStr, byte[] pkey, String IV) throws Exception {
-        byte[] base64DecodeStr = Base64Utils.decode(base64EncryptStr);
+    public static String aesDecodeStr2(String base64EncryptStr, byte[] pkey, String IV) throws Exception {
+        byte[] base64DecodeStr = Base64Utils.decode(base64EncryptStr);                              //加密的逆过程，需要先使用base64解码成密文
         byte[] aesDecode = aesDecode(base64DecodeStr, pkey, IV);
         if (aesDecode == null) {
             return null;
         }
         String result;
-        result = new String(aesDecode, "UTF-8");
+        result = new String(aesDecode, "UTF-8");                                       //字符编码很重要，不同的字符编码对应的byte位是不一样的，将直接影响解密的结果
         return result;
     }
 
@@ -164,6 +164,5 @@ public class AESUtils {
         cipher.init(Cipher.DECRYPT_MODE, skey, iv);// 初始化解密器
         byte[] result = cipher.doFinal(encryptStr);
         return result; // 解密
-
     }
 }

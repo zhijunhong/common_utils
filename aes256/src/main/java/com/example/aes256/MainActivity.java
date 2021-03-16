@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
             String base64EncryptStr = AESUtils.aesEncryptStr("我是明文 ", pkey, AESUtils.IV);    //密文
             Log.i(TAG, "encryptStr: " + base64EncryptStr + "\n");
 
-            String decodeStr = AESUtils.aesDecodeStr3(base64EncryptStr, pkey, AESUtils.IV);
+            String decodeStr = AESUtils.aesDecodeStr2(base64EncryptStr, pkey, AESUtils.IV);
             Log.i(TAG, "decodeStr: " + decodeStr + "\n");
 
         } catch (NoSuchAlgorithmException e) {
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
      * @throws NoSuchAlgorithmException
      */
     private byte[] generatePkey(String username, String password, String random) throws NoSuchAlgorithmException {
-        String mD5Str = MD5Utility.getMD5DefaultEncode(username + random + password);
-        return Sha256Utils.getSHA256ByteArray(random + mD5Str);
+        String mD5Str = MD5Utility.getMD5DefaultEncode(username + random + password);          //MD5加密
+        return Sha256Utils.getSHA256ByteArray(random + mD5Str);                                //SHA256转码
     }
 }
