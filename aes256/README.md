@@ -1,5 +1,7 @@
 # AES256加解密java语言实现
 
+![v2-6ec14833ba55ec068b0f806c6fa36b95_720w](https://github.com/zhijunhong/common_utils/blob/master/art/v2-6ec14833ba55ec068b0f806c6fa36b95_720w.png?raw=true)
+
 ## 写在前面
 
 基于项目安全性需要，有时候我们的项目会使用AES 256加解密算法。以下，是针对实现AES256 Padding7加密算法实现的关键步骤解析以及此过程遇到的一些问题总结。
@@ -22,12 +24,12 @@ GitHub链接地址：https://github.com/zhijunhong/common_utils/tree/master/aes2
 
 高级加密标准(AES,Advanced Encryption Standard)为最常见的对称加密算法。对称加密算法：简单来说就是加密和解密过程中使用的秘钥（根据一定的规则生成）是相同的。
 
-![img](https://github.com/zhijunhong/common_utils/blob/master/art/20210224001.png)
+![img](https://raw.githubusercontent.com/zhijunhong/common_utils/master/art/20210224001.png)
 
 下面简单介绍下各个部分的作用与意义：
 
-| 明文P           | 需要加密的明文                                               |
-| --------------- | ------------------------------------------------------------ |
+|<span style="white-space:nowrap;">&emsp;&emsp;明文P&emsp;&emsp;</span>| 需要加密的明文                                               |
+| :--------------- | ------------------------------------------------------------ |
 | 密钥K           | 用来加密明文的密码，在对称加密算法中，加密与解密的密钥是相同的。密钥为接收方与发送方协商产生，但不可以直接在网络上传输，否则会导致密钥泄漏，通常是通过非对称加密算法加密密钥，然后再通过网络传输给对方，或者直接面对面商量密钥。密钥是绝对不可以泄漏的，否则会被攻击者还原密文，窃取机密数据 |
 | **AES加密算法** | **设AES加密函数为E，则 C = E(K, P),其中P为明文，K为密钥，C为密文。也就是说，把明文P和密钥K作为加密函数的参数输入，则加密函数E会输出密文C** |
 | 密文C           | 经加密函数处理后，可以在网络传输中传递的密文数               |
@@ -45,17 +47,17 @@ GitHub链接地址：https://github.com/zhijunhong/common_utils/tree/master/aes2
 
 ### 生成秘钥
 
-生成秘钥的方式是需要另一端解密人员一起协定的，不同的厂商乃至不同的项目，生成秘钥的方式理论上都要是不同的。
+生成秘钥的方式是需要另一端解密人员一起协定的，不同的厂商乃至不同的项目，生成秘钥的方式理论上应该都要是不同的。
 
 这里只是为简单举例：
 
-**使用`用户名username`,`密码password`和`随机数random`经过MD5加密后再经过HAS-256 hash后生成一组密钥**
+**使用`用户名username`,`密码password`和`随机数random`经过MD5加密后再经过HAS-256 hash后生成一组密钥**，具体代码如下：
 
 ```java
 byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
+```
 
-......
-  
+```java
 /**
      * 生成秘钥
      *
@@ -66,21 +68,22 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
      * @throws NoSuchAlgorithmException
      */
     private byte[] generatePkey(String username, String password, String random) throws NoSuchAlgorithmException {
-        String mD5Str = MD5Utility.getMD5DefaultEncode(username + random + password);
-        return Sha256Utils.getSHA256ByteArray(random + mD5Str);
+        String mD5Str = MD5Utility.getMD5DefaultEncode(username + random + password);								//MD5加密,加密算法见github代码
+        return Sha256Utils.getSHA256ByteArray(random + mD5Str);																			//经过HAS-256 hash
     }
+
 ```
 
 ### 使用密钥加密明文
 
-从步骤1获取的密钥pkey，还需要指定向量IV，这里随机指定IV为一组数据串，实际项目中，需要协定统一的IV向量来加密明文。
+从步骤1获取的密钥pkey，还需要指定向量IV，这里随机指定IV为一组数据串，实际项目中，需要和解密端协定统一的IV向量。
 
 ```java
-  String base64EncryptStr = AESUtils.aesEncryptStr("我是明文 ", pkey, AESUtils.IV);    //密文
+ String base64EncryptStr = AESUtils.aesEncryptStr("我是明文 ", pkey, AESUtils.IV);    //密文
+```
 
-......
-
-  /**
+```java
+/**
      * @param content 加密前原内容
      * @param iv
      * @return base64EncodeStr   aes加密完成后内容
@@ -89,7 +92,7 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
      * @Description: aes对称加密
      */
     public static String aesEncryptStr(String content, byte[] pkey, String iv) {
-        byte[] aesEncrypt = aesEncrypt(content, pkey, iv);
+        byte[] aesEncrypt = aesEncrypt(content, pkey, iv);											//具体方法解析，见下文
         System.out.println("加密后的byte数组:" + Arrays.toString(aesEncrypt));
         String base64EncryptStr = Base64Utils.encode(aesEncrypt);
         System.out.println("加密后 base64EncodeStr:" + base64EncryptStr);
@@ -97,11 +100,13 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
     }
 ```
 
-加密方法，参数说明：
+对上述加密方法，进行参数说明：
 
-- content：待加密的明文
-- pkey：上一步骤生成的加密秘钥
+- content：待加密的**明文**
+- pkey：**“生成秘钥”**步骤生成的加密秘钥
 - iv:加密向量IV
+
+
 
 其中，具体加密方法`aesEncrypt(String content, byte[] pkey, String IV)`如下：
 
@@ -129,23 +134,13 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
     }
 ```
 
-最后，进行一轮base64转码`String base64EncryptStr = Base64Utils.encode(aesEncrypt);`操作后，输出密文字符串base64EncryptStr。
+最后，进行一轮base64转码`String base64EncryptStr = Base64Utils.encode(aesEncrypt);`操作后，输出**密文字符串**base64EncryptStr。
+
+
 
 ### 使用密钥解密密文
 
-秘钥解密的过程就是加密的逆过程，如下：解密方法
-
-```java
-  String decodeStr = AESUtils.aesDecodeStr3(base64EncryptStr, pkey, AESUtils.IV);
-```
-
-解密方法，传递三个参数：
-
-- base64EncryptStr：base64编码过的加密密文
-- pkey：秘钥（同加密秘钥）
-- IV：向量
-
-具体解密过程：先通过base64还原密文编码，再通过`aesDecode(byte[] encryptStr, byte[] pkey, String IV)`方法进行解密
+秘钥解密的过程其实就是加密的逆过程，如下：解密方法
 
 ```java
   /**
@@ -170,7 +165,17 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
     }
 ```
 
-其中，aesDecode(byte[] encryptStr, byte[] pkey, String IV)方法的具体实现，基本和加密过程相差不大，如下：
+对上述解密方法，进行参数说明：
+
+- base64EncryptStr：base64编码过的加密密文
+- pkey：秘钥（同加密秘钥）
+- IV：向量
+
+具体解密过程：先通过base64还原密文编码，再通过`aesDecode(byte[] encryptStr, byte[] pkey, String IV)`方法进行解密
+
+
+
+其中，具体解密方法`aesDecode(byte[] encryptStr, byte[] pkey, String IV)`，基本和加密过程相差不大，如下：
 
 ```java
 /**
@@ -197,14 +202,18 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
 
 通过上述一系列操作后，最后将获取的字符数组，通过`new String(aesDecode, "UTF-8")`操作，就可以将密文重新解密成明文*"我是明文"*。
 
+**这里有一点需要特别说明一下：** **字符的编码**往往会影响加解密的结果。同一个字符被ASCII、Unicode和UTF-8编码时，字符编码的位数都是有区别的。很多同学没有注意这个问题，结果会导致解密失败。所以两端在联调加解密算法的时候，最好能约定字符编码统一。
+
+打印明文和解密出的明文日志，如下：
+
 ```
 2021-02-24 18:05:33.651 21560-21560/com.example.aes256 I/MainActivity: encryptStr: y9COgiC06V2E1CIuhJbPfg==
-2021-02-24 18:05:33.652 21560-21560/com.example.aes256 I/MainActivity: decodeStr: 我是明文 
+2021-02-24 18:05:33.652 21560-21560/com.example.aes256 I/MainActivity: decodeStr: 我是明文
 ```
 
 完整代码：https://github.com/zhijunhong/common_utils/tree/master/aes256
 
-**最后，别忘了点一下star哟~**
+**最后，如果这篇博文对你有所帮助，别忘了点个赞哟 ^_^**
 
 
 
@@ -215,10 +224,3 @@ byte[] pkey = generatePkey("zhijunhong", "123456", "1111");
 [AES加密算法的详细介绍与实现](https://blog.csdn.net/qq_28205153/article/details/55798628)
 
 [SSL在线工具-AES在线加解密|AES在线加密](https://www.ssleye.com/aes_cipher.html) 非常好用的在线验证AES加解密结果网站
-
-
-
-
-
-
-
